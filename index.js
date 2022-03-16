@@ -1,5 +1,6 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+// const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 
 const app = express();
@@ -23,10 +24,24 @@ async function run() {
       const usersCollection = database.collection("Mst_Users");
       const employeeCollection = database.collection("Mst_Emploeyee");
 
-        console.log('Database connected');
+        // console.log('Database connected');
+        // get api
+        app.get('/employees', async (req,res)=>{
+            const result = await employeeCollection.find({}).toArray();
+            // console.log(result);
+            res.send(result);
+        });
+
+        app.get('/employees/:id', async (req,res)=>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const employee = await employeeCollection.findOne(query);
+            console.log('load employee with id:', id);
+            res.send(employee);
+        })
       
     } finally {
-      await client.close();
+    //   await client.close();
     }
   }
   run().catch(console.dir);
