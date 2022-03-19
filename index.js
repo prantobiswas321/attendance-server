@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
@@ -23,6 +24,7 @@ async function run() {
       const database = client.db("attendanceDB");
       const usersCollection = database.collection("Mst_Users");
       const employeeCollection = database.collection("Mst_Emploeyee");
+      const attendanceCollection = database.collection("Dat_EmpAttendancedays");
 
         // console.log('Database connected');
         // get api
@@ -38,7 +40,22 @@ async function run() {
             const employee = await employeeCollection.findOne(query);
             console.log('load employee with id:', id);
             res.send(employee);
-        })
+            jwt.sign({query}, 'secretkey', (err, token)=>{
+                res.json({
+                    token,
+                });
+                console.log('sddsd',token);
+            });
+            // res.send(employee);
+        });
+
+        // post api
+        app.post('/employees/attendance', async (req,res)=>{
+            const attendance = req.body;
+            const result = await attendanceCollection.insertOne(attendance);
+            res.json(result);
+            // console.log('dwdq', req.body, result);
+        });
       
     } finally {
     //   await client.close();
