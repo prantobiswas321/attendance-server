@@ -3,18 +3,16 @@ const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT;
 
 // middleware
 app.use(cors());
 app.use(express.json());
 
-// attendance
-// y0iMwFrBvnD6e560
-
-const uri = "mongodb+srv://attendance:y0iMwFrBvnD6e560@cluster0.1ujyx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1ujyx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -46,16 +44,9 @@ async function run() {
         app.post('/login', async (req, res)=>{
             const userName = req.body.userName;
             const password = req.body.password;
-            // console.log(userName, password);
-            const result = await usersCollection.findOne({userName: userName, password: password});
-            // if(result.password === password){
-            //     res.status(201).render("/");
-            // }
-            // else{
-            //     res.send('Wrong password');
-            // }
 
-            // res.send(result);
+            const result = await usersCollection.findOne({userName: userName, password: password});
+
             if(result){
                 const user = {
                     id: 1, 
@@ -68,9 +59,7 @@ async function run() {
                       token
                     });
                   });
-            }
-            console.log(result);
-            
+            } 
         })
 
         // post api
@@ -78,7 +67,6 @@ async function run() {
             const attendance = req.body;
             const result = await attendanceCollection.insertOne(attendance);
             res.json(result);
-            // console.log('dwdq', req.body, result);
         });
       
     } finally {
