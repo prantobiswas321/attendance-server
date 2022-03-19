@@ -40,14 +40,38 @@ async function run() {
             const employee = await employeeCollection.findOne(query);
             console.log('load employee with id:', id);
             res.send(employee);
-            jwt.sign({query}, 'secretkey', (err, token)=>{
-                res.json({
-                    token,
-                });
-                console.log('sddsd',token);
-            });
-            // res.send(employee);
         });
+
+        // post api login
+        app.post('/login', async (req, res)=>{
+            const userName = req.body.userName;
+            const password = req.body.password;
+            // console.log(userName, password);
+            const result = await usersCollection.findOne({userName: userName, password: password});
+            // if(result.password === password){
+            //     res.status(201).render("/");
+            // }
+            // else{
+            //     res.send('Wrong password');
+            // }
+
+            // res.send(result);
+            if(result){
+                const user = {
+                    id: 1, 
+                    username: 'brad',
+                    email: 'brad@gmail.com'
+                  }
+
+                jwt.sign({user},'secretkey', { expiresIn: '3000s' }, (err, token) => {
+                    res.json({
+                      token
+                    });
+                  });
+            }
+            console.log(result);
+            
+        })
 
         // post api
         app.post('/employees/attendance', async (req,res)=>{
